@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="sk" x-data="imageCompressor()">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kompresia Obrázkov</title>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        #uploadArea {
+            border: 2px dashed #ccc;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        #uploadArea.dragover {
+            border-color: #000;
+        }
+        #progress {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        #downloadLink {
+            display: none;
+            margin-top: 20px;
+        }
+        .accordion-button {
+            cursor: pointer;
+            color: blue;
+            text-decoration: underline;
+            margin-top: 10px;
+        }
+        .advanced-settings {
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="flex flex-col">
+        <img class="w-30 h-auto mx-auto my-2" src="./assets/logo.png">
+        <h1 class="text-2xl font-black mb-3">Img compress</h1>
+    </div>
+    <div id="uploadArea"
+         x-on:click="$refs.fileInput.click()"
+         x-on:dragover.prevent="$el.classList.add('dragover')"
+         x-on:dragleave="$el.classList.remove('dragover')"
+         x-on:drop.prevent="handleDrop($event)">
+        <p>Presuňte sem obrázky alebo kliknite pre výber</p>
+        <input type="file" 
+               x-ref="fileInput" 
+               multiple 
+               accept="image/*" 
+               style="display: none;" 
+               x-on:change="handleFileInput($event)">
+    </div>
+    <label for="formatSelect">Vyberte výstupný formát:</label>
+    <select id="formatSelect" x-model="format">
+        <option value="image/jpeg">JPEG</option>
+        <option value="image/png">PNG</option>
+        <option value="image/webp">WebP</option>
+    </select>
+    <br><br>
+    <button x-on:click="compressImages">Komprimovať</button>
+    <div id="progress" x-text="progressMessage"></div>
+    <a id="downloadLink" 
+       x-bind:href="downloadUrl" 
+       x-bind:style="{ display: downloadUrl ? 'block' : 'none' }" 
+       download="compressed_images.zip">
+       Stiahnuť skomprimované obrázky
+    </a>
+
+    <div>
+        <span class="accordion-button" x-on:click="showAdvanced = !showAdvanced">
+            Pokročilé nastavenia
+            <span x-text="showAdvanced ? '▲' : '▼'"></span>
+        </span>
+        <div class="advanced-settings" x-show="showAdvanced" x-transition>
+            <label for="qualityInput">Kvalita kompresie (0.1 - 1.0):</label>
+            <input type="range" 
+                   id="qualityInput" 
+                   min="0.1" 
+                   max="1.0" 
+                   step="0.01" 
+                   x-model="quality" 
+                   x-on:input="updateQualityLabel">
+            <span x-text="`Aktuálna hodnota: ${quality}`"></span>
+        </div>
+    </div>
+
+    <script>
+        function imageCompressor() {
+            return {
+                files: [],
+                format: 'image/jpeg',
+                quality: 0.7, 
+                progressMessage: '',
+                downloadUrl: null,
+                showAdvanced: false, 
+
+                handleDrop(event) {
+                    this.$el.classList.remove('dragover');
+                    this.files = Array.from(event.dataTransfer.files).filter(file => file.type.startsWith('image/'));
+                    this.updateProgress();
+                },
+
+                handleFileInput(event) {
+                    this.files = Array.from(event.target.files).filter(file => file.type.startsWith('image/'));
+                    this.updateProgress();
+                },
+
+                updateProgress() {
+                    this.progressMessage = `Nahratých ${this.files.length} obrázkov.`;
+                },
+
+                updateQualityLabel() {
+                },
+
+                async compressImages() {
+                    if (this.files.length === 0) {
+                        alert('Prosím, nahrajte aspoň jeden obrázok.');
+                        return;
+                    }
+
+                    this.progressMessage = 'Spracovanie...';
+                    const zip = new JSZip();
+
+                    for (let i = 0; i < this.files.length; i++) {
+                        const file = this.files[i];
+                        const compressedBlob = await this.compressImage(file, this.format);
+                        zip.file(`compressed_${i}.${this.format.split('/')[1]}`, compressedBlob);
+                        this.progressMessage = `Spracované ${i + 1} z ${this.files.length} obrázkov.`;
+                    }
+
+                    zip.generateAsync({ type: 'blob' }).then((content) => {
+                        this.downloadUrl = URL.createObjectURL(content);
+                        this.progressMessage = 'Kompresia dokončená. Môžete stiahnuť ZIP súbor.';
+                    });
+                },
+
+                compressImage(file, format) {
+                    return new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            const img = new Image();
+                            img.onload = () => {
+                                const canvas = document.createElement('canvas');
+                                const ctx = canvas.getContext('2d');
+                                canvas.width = img.width;
+                                canvas.height = img.height;
+                                ctx.drawImage(img, 0, 0);
+                                canvas.toBlob(resolve, format, this.quality); // Use dynamic quality
+                            };
+                            img.src = e.target.result;
+                        };
+                        reader.readAsDataURL(file);
+                    });
+                }
+            };
+        }
+    </script>
+</body>
+</html>
