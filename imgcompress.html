@@ -128,7 +128,7 @@
             x-on:dragover.prevent="$el.classList.add('dragover')"
             x-on:dragleave="$el.classList.remove('dragover')"
             x-on:drop.prevent="handleDrop($event)">
-            <p>Presuňte sem obrázky alebo <span class="text-blue underline">kliknite pre výber</span></p>
+            <p>Drag and drop images here or <span class="text-blue underline">click to select</span></p>
             <input type="file" 
                 x-ref="fileInput" 
                 multiple 
@@ -144,14 +144,14 @@
                     <button 
                         class="remove-image-btn" 
                         @click="removeImage(index)"
-                        title="Odstrániť obrázok">
+                        title="Remove Image">
                         ×
                     </button>
                 </div>
             </template>
         </div>
 
-        <label for="formatSelect">Vyberte výstupný formát:</label>
+        <label for="formatSelect">Select the output format:</label>
         <select id="formatSelect" x-model="format" class="cursor-pointer">
             <option value="image/jpeg">JPEG</option>
             <option value="image/png">PNG</option>
@@ -164,7 +164,7 @@
                 <span x-text="showAdvanced ? '▲' : '▼'"></span>
             </span>
             <div class="advanced-settings" x-show="showAdvanced" x-transition>
-                <label for="qualityInput">Kvalita kompresie (0.1 - 1.0):</label>
+                <label for="qualityInput">Quality of compression  (0.1 - 1.0):</label>
                 <input type="range" 
                     id="qualityInput" 
                     min="0.1" 
@@ -172,7 +172,7 @@
                     step="0.01" 
                     x-model="quality" 
                     x-on:input="updateQualityLabel">
-                <span x-text="`Aktuálna hodnota: ${quality}`"></span>
+                <span x-text="`Current value: ${quality}`"></span>
             </div>
         </div>
         <br><br>
@@ -182,15 +182,14 @@
             :class="darkMode ? 'bg-[#ADD8E6] text-black' : 'bg-blue-600 text-white'"
             x-on:click="compressImages"
             x-show="previewUrls.length > 0">
-            Komprimovať
+            Compress
         </button>
         <div id="progress" x-text="progressMessage"></div>
         <a id="downloadLink" 
         x-bind:href="downloadUrl" 
         x-bind:style="{ display: downloadUrl ? 'block' : 'none' }" 
         download="compressed_images.zip">
-        Stiahnuť skomprimované obrázky
-        </a>
+        Download compressed images        </a>
 
 
     </div>
