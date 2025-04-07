@@ -9,7 +9,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 
     <!--<meta name="application-name" content="Img Compress">
-    <meta name="description" content="Kompresor obrázkov pre rýchle a jednoduché zmenšovanie veľkosti obrázkov">
+    <meta name="description" content="Image compressor for quick and easy image downsizing">
     <meta name="theme-color" content="#ffffff">
     
     <link rel="manifest" href="manifest.json">-->
@@ -248,7 +248,7 @@
                 },
 
                 updateProgress() {
-                    this.progressMessage = `Nahratých ${this.files.length} obrázkov.`;
+                    //this.progressMessage = `Nahratých ${this.files.length} obrázkov.`;
                 },
 
                 updateQualityLabel() {
@@ -256,11 +256,11 @@
 
                 async compressImages() {
                     if (this.files.length === 0) {
-                        alert('Prosím, nahrajte aspoň jeden obrázok.');
+                        alert('Please upload at least one picture..');
                         return;
                     }
 
-                    this.progressMessage = 'Spracovanie...';
+                    this.progressMessage = 'Loading...';
                     const zip = new JSZip();
 
                     for (let i = 0; i < this.files.length; i++) {
@@ -272,7 +272,7 @@
 
                     zip.generateAsync({ type: 'blob' }).then((content) => {
                         this.downloadUrl = URL.createObjectURL(content);
-                        this.progressMessage = 'Kompresia dokončená. Môžete stiahnuť ZIP súbor.';
+                        this.progressMessage = 'Compression complete. You can download the zip file.';
                     });
                 },
 
