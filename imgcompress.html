@@ -1,18 +1,12 @@
 <html lang="sk" x-data="imageCompressor()">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Img compress</title>
-    <link rel="icon" type="image/x-icon" href="./assets/logo.png">
+    <link rel="icon" type="image/x-icon" href="./assets/logo.png" />
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-
-    <!--<meta name="application-name" content="Img Compress">
-    <meta name="description" content="Image compressor for quick and easy image downsizing">
-    <meta name="theme-color" content="#ffffff">
-    
-    <link rel="manifest" href="manifest.json">-->
 
     <style>
         @import "tailwindcss";
@@ -88,6 +82,7 @@
             border: 1px solid #ccc;
             border-radius: 5px;
             overflow: hidden;
+            padding-bottom: 5px;
         }
         .image-preview-container img {
             width: 100%;
@@ -122,6 +117,7 @@
             <span x-text="darkMode ? '🌞 Light' : '🌙 Dark'"></span>
         </button>
     </nav>
+
     <div class="p-3">
         <div id="uploadArea" class="p-10 mb-5 cursor-pointer"
             x-on:click="$refs.fileInput.click()"
@@ -141,6 +137,7 @@
             <template x-for="(preview, index) in previewUrls" :key="index">
                 <div class="image-preview-container">
                     <img :src="preview" alt="Image preview">
+                    <p class="text-sm mt-1 truncate p-1" x-text="fileNames[index]"></p>
                     <button 
                         class="remove-image-btn" 
                         @click="removeImage(index)"
@@ -158,13 +155,12 @@
             <option value="image/webp">WebP</option>
         </select>
 
-                <div>
+        <div>
             <span class="accordion-button p-3 font-bold transition-colors rounded-md" x-on:click="showAdvanced = !showAdvanced">
-                                Advanced settings
-                <span x-text="showAdvanced ? '▲' : '▼'"></span>
+                Advanced settings <span x-text="showAdvanced ? '▲' : '▼'"></span>
             </span>
             <div class="advanced-settings" x-show="showAdvanced" x-transition>
-                <label for="qualityInput">Quality of compression  (0.1 - 1.0):</label>
+                <label for="qualityInput">Quality of compression (0.1 - 1.0):</label>
                 <input type="range" 
                     id="qualityInput" 
                     min="0.1" 
@@ -186,12 +182,11 @@
         </button>
         <div id="progress" x-text="progressMessage"></div>
         <a id="downloadLink" 
-        x-bind:href="downloadUrl" 
-        x-bind:style="{ display: downloadUrl ? 'block' : 'none' }" 
-        download="compressed_images.zip">
-        Download compressed images        </a>
-
-
+           x-bind:href="downloadUrl" 
+           x-bind:style="{ display: downloadUrl ? 'block' : 'none' }" 
+           download="compressed_images.zip">
+           Download compressed images
+        </a>
     </div>
 
     <script>
@@ -208,12 +203,13 @@
         function imageCompressor() {
             return {
                 files: [],
+                fileNames: [],
                 previewUrls: [],
                 format: 'image/jpeg',
-                quality: 0.7, 
+                quality: 0.7,
                 progressMessage: '',
                 downloadUrl: null,
-                showAdvanced: false, 
+                showAdvanced: false,
 
                 handleDrop(event) {
                     this.$el.classList.remove('dragover');
@@ -226,9 +222,10 @@
 
                 processFiles(inputFiles) {
                     const imageFiles = Array.from(inputFiles).filter(file => file.type.startsWith('image/'));
-                    
+
                     imageFiles.forEach(file => {
                         this.files.push(file);
+                        this.fileNames.push(file.name);
                         const reader = new FileReader();
                         reader.onload = (e) => {
                             this.previewUrls.push(e.target.result);
@@ -241,22 +238,22 @@
 
                 removeImage(index) {
                     this.files.splice(index, 1);
-                    
+                    this.fileNames.splice(index, 1);
                     this.previewUrls.splice(index, 1);
-
                     this.updateProgress();
                 },
 
                 updateProgress() {
-                    //this.progressMessage = `Nahratých ${this.files.length} obrázkov.`;
+                    // Optional: update progress info
                 },
 
                 updateQualityLabel() {
+                    // Optional: quality label update
                 },
 
                 async compressImages() {
                     if (this.files.length === 0) {
-                        alert('Please upload at least one picture..');
+                        alert('Please upload at least one picture.');
                         return;
                     }
 
