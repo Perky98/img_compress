@@ -163,7 +163,8 @@
       Compress
     </button>
     <div id="progress" x-text="progressMessage"></div>
-    <a id="downloadLink"
+    <a id="downloadLink" class="cursor-pointer p-3 font-bold transition-colors rounded-md"
+      :class="darkMode ? 'bg-[#ADD8E6] text-black' : 'bg-blue-600 text-white'"
       x-bind:href="downloadUrl"
       x-bind:style="{ display: downloadUrl ? 'block' : 'none' }"
       download="compressed_images.zip">
