@@ -115,7 +115,7 @@
 <body x-data="{ darkMode: false }" x-init="darkMode = localStorage.theme === 'dark'" :class="{ 'dark': darkMode }">
     <nav class="flex justify-between items-center pb-2 shadow-[0px_10px_6px_0px_rgba(0,_0,_0,_0.4)] mb-5 px-3">
         <div class="flex items-center">
-            <img class="w-20 h-auto my-2" src="./assets/logo.png">
+            <img class="w-20 h-auto my-2 p-4" src="./assets/logo.png">
             <span class="text-2xl font-black mb-3 text-left pl-2"><a href="imgcompress.html">Img compress</a></span>
         </div>
         <button id="theme-toggle" @click="darkMode = !darkMode; localStorage.theme = darkMode ? 'dark' : 'light'">
