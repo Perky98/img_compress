@@ -1,1 +1,2 @@
-# img_compress
+# Image compressor 
+From PNG to WEBP
